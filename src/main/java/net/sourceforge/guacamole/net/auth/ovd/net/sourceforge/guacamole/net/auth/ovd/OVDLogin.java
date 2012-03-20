@@ -72,18 +72,22 @@ public class OVDLogin extends HttpServlet {
             configs = authProvider.getAuthorizedConfigurations(webClientSessionID);
         }
         catch (GuacamoleException e) {
-            logger.error("Error retrieving configuration(s) for webclient webservices with PHPSESSID {}.", webClientSessionID);
+            logger.error(e.getMessage());
+            logger.error("Error retrieving configuration(s) for webclient webservices with PHPSESSID {}{}", webClientSessionID);
             response.sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
         }
         
         if (configs == null) {
-            logger.warn("Failed to get RDP details from {} for PHP SESSION\"{}\".", request.getRemoteAddr(), webClientSessionID);
+            logger.warn("Failed to get RDP details from {} for PHP SESSION\"{}\".", request.getRemoteAddr(), webClientSessionID);
             response.sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
         }
 
-        logger.info("Successful fetching of RDP details from {} for Session ID \"{}\".", request.getRemoteAddr(), webClientSessionID);
+        logger.info("Successful fetching of RDP details from {} for Session ID {}.", request.getRemoteAddr(), webClientSessionID);
+	logger.info("Credentials are login:{} pass:{}", 
+		    configs.get("DEFAULT").getParameter("username"),
+		    configs.get("DEFAULT").getParameter("password"));
 
         // Associate configs with session
         httpSession.setAttribute("GUAC_CONFIGS", configs);

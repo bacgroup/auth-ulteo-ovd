@@ -96,13 +96,13 @@ public class UlteoOVDAuthenticationProvider implements
 					"Error fetching XML from webclient server at "+url, e);
 		} catch (SAXException e) {
 			throw new GuacamoleException(
-					"Error parsing webclient server XML file", e);
+						     "Error parsing webclient server XML file : " + e.getMessage(), e);
 		}
 
 
 
 		Map<String, GuacamoleConfiguration> configs = contentHandler.getConfigs();
-		if  (! configs.containsKey("DEFAULT")) {
+		if  (configs.containsKey("DEFAULT")) {
 			return configs;
 		} else {
 			// No config for that phpsessid
@@ -117,7 +117,7 @@ public class UlteoOVDAuthenticationProvider implements
 		}
 
 		private State state = State.ROOT;
-		private Map<String, GuacamoleConfiguration> configs;
+		private Map<String, GuacamoleConfiguration> configs = new HashMap<String, GuacamoleConfiguration>();
 
 		@Override
 		public void endElement(String uri, String localName, String qName)
@@ -126,7 +126,6 @@ public class UlteoOVDAuthenticationProvider implements
 			switch (state) {
 
 			case SESSION:
-
 				if (localName.equals("session")) {
 					state = State.END;
 					return;
@@ -135,6 +134,12 @@ public class UlteoOVDAuthenticationProvider implements
 			case SETTINGS:
 				if (localName.equals("settings")) {
 					state = State.SESSION;
+					return;
+				}
+
+			case SETTING:
+				if (localName.equals("setting")) {
+					state = State.SETTINGS;
 					return;
 				}
 
@@ -149,9 +154,19 @@ public class UlteoOVDAuthenticationProvider implements
 					state = State.SERVER;
 					return;
 				}
+			case MIME:
+				if (localName.equals("mime")) {
+					state = State.APPLICATION;
+					return;
+				}
+			case USER:
+				if (localName.equals("user")) {
+					state = State.SESSION;
+					return;
+				}
+
 			}
 			throw new SAXException("Unexpected closing: " + localName);
-
 		}
 
 		@Override
@@ -192,14 +207,14 @@ public class UlteoOVDAuthenticationProvider implements
 					state = State.SETTINGS;
 					return;
 				} else if (localName.equals("user")) {
-					state = State.SESSION;
+					state = State.USER;
 					return;
 				}
 
 			case SETTINGS:
 				if (localName.equals("setting")) {
 					// Next state
-					state = State.SETTINGS;
+					state = State.SETTING;
 					return;
 				}
 
@@ -211,7 +226,7 @@ public class UlteoOVDAuthenticationProvider implements
 
 			case APPLICATION:
 				if (localName.equals("mime")) {
-					state = State.APPLICATION;
+					state = State.MIME;
 					return;
 				}
 
