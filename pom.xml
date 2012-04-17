@@ -52,7 +52,6 @@
     </build>
 
     <dependencies>
-
         <!-- Guacamole Java API -->
         <dependency>
             <groupId>net.sourceforge.guacamole</groupId>
@@ -63,7 +62,7 @@
         <!-- Guacamole Auth API -->
         <dependency>
             <groupId>net.sourceforge.guacamole</groupId>
-            <artifactId>guacamole-common-auth</artifactId>
+            <artifactId>guacamole-ext</artifactId>
             <version>0.6.0</version>
         </dependency>
 

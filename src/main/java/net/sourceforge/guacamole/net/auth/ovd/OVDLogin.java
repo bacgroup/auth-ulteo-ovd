@@ -20,6 +20,8 @@ package net.sourceforge.guacamole.net.auth.ovd;
  */
 
 import net.sourceforge.guacamole.net.auth.AuthenticationProvider;
+import net.sourceforge.guacamole.net.auth.Credentials;
+
 import java.io.IOException;
 import java.util.Map;
 import javax.servlet.ServletException;
@@ -42,7 +44,16 @@ import org.slf4j.LoggerFactory;
  * @author Michael Jumper, Jocelyn Delalande
  */
 public class OVDLogin extends HttpServlet {
-
+    /**
+     * The session attribute holding the map of configurations.
+     */
+    private static final String CONFIGURATIONS_ATTRIBUTE = "GUAC_CONFIGS";
+    
+    /**
+     * The session attribute holding the credentials authorizing this session.
+     */
+    private static final String CREDENTIALS_ATTRIBUTE = "GUAC_CREDS";
+	
     //TODO
     private Logger logger = LoggerFactory.getLogger(OVDLogin.class);
     
@@ -63,13 +74,18 @@ public class OVDLogin extends HttpServlet {
 
         HttpSession httpSession = request.getSession(true);
 
+		// We store the phpSessionID in the username field, as we are forced to use a 
+		// login/pass scheme for storage
+    	Credentials credentials = new Credentials();
+    	
         // Retrieve the session ID used with PHP OVD webservices
         String webClientSessionID = request.getParameter("webclient_PHPSESSID");
         
         // Get authorized configs
         Map<String, GuacamoleConfiguration> configs;
         try {
-            configs = authProvider.getAuthorizedConfigurations(webClientSessionID);
+        	credentials.setUsername(webClientSessionID);
+            configs = authProvider.getAuthorizedConfigurations(credentials);
         }
         catch (GuacamoleException e) {
             logger.error(e.getMessage());
@@ -90,7 +106,8 @@ public class OVDLogin extends HttpServlet {
 		    configs.get("DEFAULT").getParameter("password"));
 
         // Associate configs with session
-        httpSession.setAttribute("GUAC_CONFIGS", configs);
+        httpSession.setAttribute(CONFIGURATIONS_ATTRIBUTE, configs);
+        httpSession.setAttribute(CREDENTIALS_ATTRIBUTE, credentials);
 
     }
 

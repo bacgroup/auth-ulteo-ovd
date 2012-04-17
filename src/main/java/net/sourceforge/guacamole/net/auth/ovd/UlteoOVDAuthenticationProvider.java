@@ -21,6 +21,8 @@ package net.sourceforge.guacamole.net.auth.ovd;
 
 import java.io.BufferedReader;
 import net.sourceforge.guacamole.net.auth.AuthenticationProvider;
+import net.sourceforge.guacamole.net.auth.Credentials;
+
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -55,15 +57,18 @@ import org.xml.sax.helpers.XMLReaderFactory;
  * @author Jocelyn Delalande
  */
 public class UlteoOVDAuthenticationProvider implements
-		AuthenticationProvider<String> {
+		AuthenticationProvider {
 
 	private Logger logger = LoggerFactory
 			.getLogger(UlteoOVDAuthenticationProvider.class);
 
 	@Override
 	public Map<String, GuacamoleConfiguration> getAuthorizedConfigurations(
-			String phpSessionID) throws GuacamoleException {
+			Credentials credentials) throws GuacamoleException {
 
+		// We store the phpSessionID in the username field, as we are forced to use a 
+		// login/pass scheme for storage
+		String phpSessionID = credentials.getUsername();
 		String url = "http://localhost/ovd/servers.php";
 		ServerFileContentHandler contentHandler;
 		// Parse XML document
