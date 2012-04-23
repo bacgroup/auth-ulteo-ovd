@@ -101,10 +101,16 @@ public class OVDLogin extends HttpServlet {
         }
 
         logger.info("Successful fetching of RDP details from {} for Session ID {}.", request.getRemoteAddr(), webClientSessionID);
-	logger.info("Credentials are login:{} pass:{}", 
-		    configs.get("DEFAULT").getParameter("username"),
-		    configs.get("DEFAULT").getParameter("password"));
 
+		// Set client-side resolution
+        GuacamoleConfiguration defaultConfig = configs.get("DEFAULT");
+        if (request.getParameter("width") != null && request.getParameter("height") != null) {	
+        	configs.get("DEFAULT").setParameter("width", request.getParameter("width"));
+        	configs.get("DEFAULT").setParameter("height", request.getParameter("height"));
+        } else {
+        	logger.info("No dimensions specified...");
+        }
+        	
         // Associate configs with session
         httpSession.setAttribute(CONFIGURATIONS_ATTRIBUTE, configs);
         httpSession.setAttribute(CREDENTIALS_ATTRIBUTE, credentials);
