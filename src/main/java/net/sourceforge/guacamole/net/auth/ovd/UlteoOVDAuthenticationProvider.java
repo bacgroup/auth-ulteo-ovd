@@ -118,7 +118,7 @@ public class UlteoOVDAuthenticationProvider implements
 	private static class ServerFileContentHandler extends DefaultHandler {
 
 		private enum State {
-			ROOT, SESSION, SETTINGS, SETTING, USER, APPLICATION, MIME, SERVER, PARAMETER, END;
+			ROOT, SESSION, SETTINGS, SETTING, USER, APPLICATION, MIME, SERVER, PARAMETER, END, PROFILE;
 		}
 
 		private State state = State.ROOT;
@@ -169,6 +169,12 @@ public class UlteoOVDAuthenticationProvider implements
 					state = State.SESSION;
 					return;
 				}
+			case PROFILE:
+				if (localName.equals("profile")) {
+					state = State.SESSION;
+					return;
+				}
+
 
 			}
 			throw new SAXException("Unexpected closing: " + localName);
@@ -213,6 +219,9 @@ public class UlteoOVDAuthenticationProvider implements
 					return;
 				} else if (localName.equals("user")) {
 					state = State.USER;
+					return;
+				} else if (localName.equals("profile")) {
+					state = State.PROFILE;
 					return;
 				}
 
