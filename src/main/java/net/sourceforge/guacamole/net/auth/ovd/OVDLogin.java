@@ -37,43 +37,40 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class OVDLogin extends HttpServlet {
-    private static final String CONFIGURATIONS_ATTRIBUTE = "GUAC_CONFIGS";
-    private static final String CREDENTIALS_ATTRIBUTE = "GUAC_CREDS";
-    private Logger logger = LoggerFactory.getLogger(OVDLogin.class);
-    
-    @Override
-    public void init() throws ServletException {
-    }
+	private static final String CONFIGURATIONS_ATTRIBUTE = "GUAC_CONFIGS";
+	private static final String CREDENTIALS_ATTRIBUTE = "GUAC_CREDS";
+	private Logger logger = LoggerFactory.getLogger(OVDLogin.class);
 
-    @Override
-    protected void service(HttpServletRequest request, HttpServletResponse response) throws IOException {
-				/* Get the user session */
-        HttpSession httpSession = request.getSession(true);
+	@Override
+	public void init() throws ServletException {
+	}
 
-				/* Guacamole configuration */
-				Credentials credentials = new Credentials();
-				GuacamoleConfiguration g_conf = new GuacamoleConfiguration();
-        Map<String, GuacamoleConfiguration> configs = (Map<String, GuacamoleConfiguration>) httpSession.getAttribute(CONFIGURATIONS_ATTRIBUTE);
+	@Override
+	protected void service(HttpServletRequest request, HttpServletResponse response) throws IOException {
+		/* Get the user session */
+		HttpSession httpSession = request.getSession(true);
 
-				if(configs == null) {
-					/* No existing configs, creating a new one */
-					configs = new HashMap<String, GuacamoleConfiguration>();
-				}
+		/* Guacamole configuration */
+		Credentials credentials = new Credentials();
+		GuacamoleConfiguration g_conf = new GuacamoleConfiguration();
+		Map<String, GuacamoleConfiguration> configs = (Map<String, GuacamoleConfiguration>) httpSession.getAttribute(CONFIGURATIONS_ATTRIBUTE);
 
-				/* Configure the guacamole connection */
-				g_conf.setProtocol("rdp");
-				g_conf.setParameter("hostname", request.getParameter("server"));
-				g_conf.setParameter("username", request.getParameter("username"));
-				g_conf.setParameter("password", request.getParameter("password"));
-        g_conf.setParameter("width", request.getParameter("width"));
-				g_conf.setParameter("height", request.getParameter("height"));
-				configs.put(request.getParameter("id"), g_conf);
+		if(configs == null) {
+			/* No existing configs, creating a new one */
+			configs = new HashMap<String, GuacamoleConfiguration>();
+		}
 
-        // Associate configs with session
-        httpSession.setAttribute(CONFIGURATIONS_ATTRIBUTE, configs);
-        httpSession.setAttribute(CREDENTIALS_ATTRIBUTE, credentials);
+		/* Configure the guacamole connection */
+		g_conf.setProtocol("rdp");
+		g_conf.setParameter("hostname", request.getParameter("server"));
+		g_conf.setParameter("username", request.getParameter("username"));
+		g_conf.setParameter("password", request.getParameter("password"));
+		g_conf.setParameter("width", request.getParameter("width"));
+		g_conf.setParameter("height", request.getParameter("height"));
+		configs.put(request.getParameter("id"), g_conf);
 
-    }
-
+		// Associate configs with session
+		httpSession.setAttribute(CONFIGURATIONS_ATTRIBUTE, configs);
+		httpSession.setAttribute(CREDENTIALS_ATTRIBUTE, credentials);
+	}
 }
-
