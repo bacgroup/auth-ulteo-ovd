@@ -47,20 +47,29 @@ public class OVDLogin extends HttpServlet {
 
     @Override
     protected void service(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        Map<String, GuacamoleConfiguration> configs = new HashMap<String, GuacamoleConfiguration>();
+				/* Get the user session */
+        HttpSession httpSession = request.getSession(true);
+
+				/* Guacamole configuration */
 				Credentials credentials = new Credentials();
 				GuacamoleConfiguration g_conf = new GuacamoleConfiguration();
+        Map<String, GuacamoleConfiguration> configs = (Map<String, GuacamoleConfiguration>) httpSession.getAttribute(CONFIGURATIONS_ATTRIBUTE);
 
+				if(configs == null) {
+					/* No existing configs, creating a new one */
+					configs = new HashMap<String, GuacamoleConfiguration>();
+				}
+
+				/* Configure the guacamole connection */
 				g_conf.setProtocol("rdp");
 				g_conf.setParameter("hostname", request.getParameter("server"));
 				g_conf.setParameter("username", request.getParameter("username"));
 				g_conf.setParameter("password", request.getParameter("password"));
         g_conf.setParameter("width", request.getParameter("width"));
 				g_conf.setParameter("height", request.getParameter("height"));
-				configs.put("DEFAULT", g_conf);
-        	
+				configs.put(request.getParameter("id"), g_conf);
+
         // Associate configs with session
-        HttpSession httpSession = request.getSession(true);
         httpSession.setAttribute(CONFIGURATIONS_ATTRIBUTE, configs);
         httpSession.setAttribute(CREDENTIALS_ATTRIBUTE, credentials);
 
