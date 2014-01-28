@@ -63,6 +63,7 @@ public class OVDLogin extends HttpServlet {
 		/* Configure the guacamole connection */
 		g_conf.setProtocol("rdp");
 		g_conf.setParameter("hostname", request.getParameter("server"));
+		g_conf.setParameter("port", request.getParameter("port"));
 		g_conf.setParameter("username", request.getParameter("username"));
 		g_conf.setParameter("password", request.getParameter("password"));
 		g_conf.setParameter("width", request.getParameter("width"));
