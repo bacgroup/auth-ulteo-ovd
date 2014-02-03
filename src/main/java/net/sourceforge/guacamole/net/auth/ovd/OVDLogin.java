@@ -68,6 +68,14 @@ public class OVDLogin extends HttpServlet {
 		g_conf.setParameter("password", request.getParameter("password"));
 		g_conf.setParameter("width", request.getParameter("width"));
 		g_conf.setParameter("height", request.getParameter("height"));
+		
+		String mode = request.getParameter("mode");
+		if (mode != null) {
+			if (mode.equals("desktop"))
+				g_conf.setParameter("initial-program", "OvdDesktop");
+			else
+				g_conf.setParameter("initial-program", "OvdRemoteApps");
+		}
 		configs.put(request.getParameter("id"), g_conf);
 
 		// Associate configs with session
